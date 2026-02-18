@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Balans{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-clipboard-data"></i> Balans</h2>
+    <div>
+        <a href="{{ url_for('rapportages.export_csv', rapport='balans') }}" class="btn btn-outline-success me-2">
+            <i class="bi bi-file-earmark-spreadsheet"></i> CSV
+        </a>
+        <a href="{{ url_for('rapportages.export_pdf', rapport='balans') }}" class="btn btn-outline-danger me-2">
+            <i class="bi bi-file-pdf"></i> PDF
+        </a>
+        <a href="{{ url_for('rapportages.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Terug
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white"><strong>Activa</strong></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        {% for r in activa %}
+                        <tr>
+                            <td>{{ r.code }}</td>
+                            <td>{{ r.naam }}</td>
+                            <td class="text-end">{{ r.saldo|euro }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted text-center">Geen activa</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="2">Totaal Activa</td>
+                            <td class="text-end">{{ totaal_activa|euro }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white"><strong>Passiva</strong></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        {% for r in passiva %}
+                        <tr>
+                            <td>{{ r.code }}</td>
+                            <td>{{ r.naam }}</td>
+                            <td class="text-end">{{ (-r.saldo)|euro }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted text-center">Geen passiva</td></tr>
+                        {% endfor %}
+                        {% if winst != 0 %}
+                        <tr class="table-warning">
+                            <td></td>
+                            <td>Resultaat lopend boekjaar</td>
+                            <td class="text-end">{{ winst|euro }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="2">Totaal Passiva</td>
+                            <td class="text-end">{{ ((-totaal_passiva) + winst)|euro }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

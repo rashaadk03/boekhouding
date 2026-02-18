@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Nieuwe betaling{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-plus-lg"></i> Nieuwe betaling</h2>
+    <a href="{{ url_for('betalingen.lijst') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Terug
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" action="{{ url_for('betalingen.nieuw') }}">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Factuurtype *</label>
+                    <select name="factuur_type" id="factuur_type" class="form-select" required onchange="updateFactuurLijst()">
+                        <option value="">Selecteer...</option>
+                        <option value="verkoop" {% if pre_type == 'verkoop' %}selected{% endif %}>Verkoopfactuur (inkomend)</option>
+                        <option value="inkoop" {% if pre_type == 'inkoop' %}selected{% endif %}>Inkoopfactuur (uitgaand)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Factuur *</label>
+                    <select name="factuur_id" id="factuur_id" class="form-select" required>
+                        <option value="">Selecteer eerst een type...</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Bedrag *</label>
+                    <div class="input-group">
+                        <span class="input-group-text">&euro;</span>
+                        <input type="number" name="bedrag" id="bedrag" class="form-control" step="0.01" min="0.01" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Datum *</label>
+                    <input type="date" name="datum" class="form-control" required value="{{ vandaag }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Betaalmethode</label>
+                    <select name="betaalmethode" class="form-select">
+                        <option value="bank">Bankoverschrijving</option>
+                        <option value="kas">Contant</option>
+                        <option value="pin">Pinbetaling</option>
+                        <option value="creditcard">Creditcard</option>
+                        <option value="ideal">iDEAL</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Referentie</label>
+                    <input type="text" name="referentie" class="form-control" placeholder="Bijv. banktransactie nummer">
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Betaling registreren
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+const verkoopFacturen = [
+    {% for f in verkoop_facturen %}
+    {id: {{ f.id }}, nummer: "{{ f.factuurnummer }}", klant: "{{ f.klant.naam }}", openstaand: {{ f.openstaand_bedrag }}},
+    {% endfor %}
+];
+const inkoopFacturen = [
+    {% for f in inkoop_facturen %}
+    {id: {{ f.id }}, nummer: "{{ f.factuurnummer }}", leverancier: "{{ f.leverancier.naam }}", openstaand: {{ f.openstaand_bedrag }}},
+    {% endfor %}
+];
+
+function updateFactuurLijst() {
+    const type = document.getElementById('factuur_type').value;
+    const select = document.getElementById('factuur_id');
+    const bedrag = document.getElementById('bedrag');
+    select.innerHTML = '<option value="">Selecteer een factuur...</option>';
+
+    const facturen = type === 'verkoop' ? verkoopFacturen : inkoopFacturen;
+    facturen.forEach(f => {
+        const naam = type === 'verkoop' ? f.klant : f.leverancier;
+        const opt = document.createElement('option');
+        opt.value = f.id;
+        opt.textContent = `${f.nummer} - ${naam} (openstaand: € ${f.openstaand.toFixed(2)})`;
+        opt.dataset.openstaand = f.openstaand;
+        if ("{{ pre_id }}" == f.id) opt.selected = true;
+        select.appendChild(opt);
+    });
+
+    select.onchange = function() {
+        const selected = select.options[select.selectedIndex];
+        if (selected && selected.dataset.openstaand) {
+            bedrag.value = parseFloat(selected.dataset.openstaand).toFixed(2);
+        }
+    };
+
+    // Trigger if pre-selected
+    if ("{{ pre_id }}") select.onchange();
+}
+
+// Init if pre-selected
+if ("{{ pre_type }}") updateFactuurLijst();
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Betalingen{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-credit-card"></i> Betalingen</h2>
+    <a href="{{ url_for('betalingen.nieuw') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nieuwe betaling
+    </a>
+</div>
+
+<div class="mb-3">
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('betalingen.lijst') }}" class="btn btn-sm {% if not type_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">Alle</a>
+        <a href="{{ url_for('betalingen.lijst', type='inkomend') }}" class="btn btn-sm {% if type_filter == 'inkomend' %}btn-success{% else %}btn-outline-success{% endif %}">Inkomend</a>
+        <a href="{{ url_for('betalingen.lijst', type='uitgaand') }}" class="btn btn-sm {% if type_filter == 'uitgaand' %}btn-danger{% else %}btn-outline-danger{% endif %}">Uitgaand</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Type</th>
+                    <th>Factuur</th>
+                    <th>Relatie</th>
+                    <th>Methode</th>
+                    <th>Referentie</th>
+                    <th class="text-end">Bedrag</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in betalingen %}
+                <tr>
+                    <td>{{ b.datum|datum }}</td>
+                    <td>
+                        {% if b.type == 'inkomend' %}
+                        <span class="badge bg-success">Inkomend</span>
+                        {% else %}
+                        <span class="badge bg-danger">Uitgaand</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if b.factuur_obj %}
+                            {% if b.factuur_type == 'verkoop' %}
+                            <a href="{{ url_for('verkoopfacturen.detail', id=b.factuur_id) }}">{{ b.factuur_obj.factuurnummer }}</a>
+                            {% else %}
+                            <a href="{{ url_for('inkoopfacturen.detail', id=b.factuur_id) }}">{{ b.factuur_obj.factuurnummer }}</a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if b.factuur_obj %}
+                            {% if b.factuur_type == 'verkoop' %}
+                                {{ b.factuur_obj.klant.naam }}
+                            {% else %}
+                                {{ b.factuur_obj.leverancier.naam }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>{{ b.betaalmethode|capitalize }}</td>
+                    <td>{{ b.referentie or '-' }}</td>
+                    <td class="text-end fw-bold {% if b.type == 'inkomend' %}text-success{% else %}text-danger{% endif %}">
+                        {% if b.type == 'uitgaand' %}-{% endif %}{{ b.bedrag|euro }}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">Geen betalingen gevonden.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

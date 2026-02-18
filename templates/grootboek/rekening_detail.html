@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Grootboek {{ rekening.code }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-book"></i> {{ rekening.code }} - {{ rekening.naam }}</h2>
+    <a href="{{ url_for('grootboek.rekeningen') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Terug
+    </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <span class="badge bg-secondary me-2">{{ rekening.type|capitalize }}</span>
+        <strong>Huidig saldo: </strong>
+        {% if regels %}
+            <span class="fs-5 fw-bold">{{ regels[-1].lopend_saldo|euro }}</span>
+        {% else %}
+            <span class="fs-5 fw-bold">{{ 0|euro }}</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Datum</th>
+                    <th>Omschrijving</th>
+                    <th>Referentie</th>
+                    <th class="text-end">Debet</th>
+                    <th class="text-end">Credit</th>
+                    <th class="text-end">Saldo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for regel in regels %}
+                <tr>
+                    <td>{{ regel.journaalpost.datum|datum }}</td>
+                    <td>{{ regel.journaalpost.omschrijving }}</td>
+                    <td>{{ regel.journaalpost.referentie or '-' }}</td>
+                    <td class="text-end">{% if regel.debet %}{{ regel.debet|euro }}{% endif %}</td>
+                    <td class="text-end">{% if regel.credit %}{{ regel.credit|euro }}{% endif %}</td>
+                    <td class="text-end fw-bold">{{ regel.lopend_saldo|euro }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted py-4">Geen boekingen op deze rekening.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

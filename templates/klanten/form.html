@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{% if klant %}Klant bewerken{% else %}Nieuwe klant{% endif %}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>
+        <i class="bi bi-{% if klant %}pencil{% else %}plus-lg{% endif %}"></i>
+        {% if klant %}Klant bewerken{% else %}Nieuwe klant{% endif %}
+    </h2>
+    <a href="{{ url_for('klanten.lijst') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Terug
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" action="{% if klant %}{{ url_for('klanten.bewerk', id=klant.id) }}{% else %}{{ url_for('klanten.nieuw') }}{% endif %}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Bedrijfsnaam *</label>
+                    <input type="text" name="naam" class="form-control" required value="{{ klant.naam if klant else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ klant.email if klant else '' }}">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Adres</label>
+                    <input type="text" name="adres" class="form-control" value="{{ klant.adres if klant else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Postcode</label>
+                    <input type="text" name="postcode" class="form-control" value="{{ klant.postcode if klant else '' }}">
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Plaats</label>
+                    <input type="text" name="plaats" class="form-control" value="{{ klant.plaats if klant else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Land</label>
+                    <input type="text" name="land" class="form-control" value="{{ klant.land if klant else 'Nederland' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">KvK-nummer</label>
+                    <input type="text" name="kvk_nummer" class="form-control" value="{{ klant.kvk_nummer if klant else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">BTW-nummer</label>
+                    <input type="text" name="btw_nummer" class="form-control" value="{{ klant.btw_nummer if klant else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Telefoon</label>
+                    <input type="text" name="telefoon" class="form-control" value="{{ klant.telefoon if klant else '' }}">
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> {% if klant %}Opslaan{% else %}Aanmaken{% endif %}
+                </button>
+                <a href="{{ url_for('klanten.lijst') }}" class="btn btn-outline-secondary ms-2">Annuleren</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

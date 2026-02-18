@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Verkoopfacturen{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-receipt"></i> Verkoopfacturen</h2>
+    <div>
+        <a href="{{ url_for('verkoopfacturen.openstaand') }}" class="btn btn-outline-warning me-2">
+            <i class="bi bi-clock"></i> Openstaand
+        </a>
+        <a href="{{ url_for('verkoopfacturen.herinneringen') }}" class="btn btn-outline-danger me-2">
+            <i class="bi bi-bell"></i> Herinneringen
+        </a>
+        <a href="{{ url_for('verkoopfacturen.nieuw') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Nieuwe factuur
+        </a>
+    </div>
+</div>
+
+<!-- Status filter -->
+<div class="mb-3">
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('verkoopfacturen.lijst') }}" class="btn btn-sm {% if not status %}btn-primary{% else %}btn-outline-primary{% endif %}">Alle</a>
+        <a href="{{ url_for('verkoopfacturen.lijst', status='concept') }}" class="btn btn-sm {% if status == 'concept' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">Concept</a>
+        <a href="{{ url_for('verkoopfacturen.lijst', status='verzonden') }}" class="btn btn-sm {% if status == 'verzonden' %}btn-info{% else %}btn-outline-info{% endif %}">Verzonden</a>
+        <a href="{{ url_for('verkoopfacturen.lijst', status='betaald') }}" class="btn btn-sm {% if status == 'betaald' %}btn-success{% else %}btn-outline-success{% endif %}">Betaald</a>
+        <a href="{{ url_for('verkoopfacturen.lijst', status='vervallen') }}" class="btn btn-sm {% if status == 'vervallen' %}btn-danger{% else %}btn-outline-danger{% endif %}">Vervallen</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Factuurnummer</th>
+                    <th>Klant</th>
+                    <th>Datum</th>
+                    <th>Vervaldatum</th>
+                    <th>Status</th>
+                    <th class="text-end">Totaal</th>
+                    <th class="text-end">Openstaand</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in facturen %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('verkoopfacturen.detail', id=f.id) }}">
+                            <strong>{{ f.factuurnummer }}</strong>
+                        </a>
+                    </td>
+                    <td>{{ f.klant.naam }}</td>
+                    <td>{{ f.factuurdatum|datum }}</td>
+                    <td>{{ f.vervaldatum|datum }}</td>
+                    <td>
+                        <span class="badge badge-{{ f.status }}">{{ f.status|capitalize }}</span>
+                    </td>
+                    <td class="text-end">{{ f.totaal|euro }}</td>
+                    <td class="text-end">
+                        {% if f.status != 'betaald' and f.status != 'concept' %}
+                            <strong class="{% if f.is_vervallen %}text-danger{% endif %}">{{ f.openstaand_bedrag|euro }}</strong>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        Geen facturen gevonden. <a href="{{ url_for('verkoopfacturen.nieuw') }}">Maak een factuur aan</a>.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

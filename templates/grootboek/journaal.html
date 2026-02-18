@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Journaal{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-journal-text"></i> Journaal</h2>
+    <a href="{{ url_for('grootboek.rekeningen') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Terug naar grootboek
+    </a>
+</div>
+
+{% for post in posten %}
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between">
+        <div>
+            <strong>#{{ post.id }}</strong> - {{ post.omschrijving }}
+        </div>
+        <div class="text-muted">
+            {{ post.datum|datum }}
+            {% if post.referentie %} | Ref: {{ post.referentie }}{% endif %}
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead>
+                <tr>
+                    <th>Rekening</th>
+                    <th class="text-end">Debet</th>
+                    <th class="text-end">Credit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for regel in post.regels %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('grootboek.rekening_detail', id=regel.grootboekrekening.id) }}">
+                            {{ regel.grootboekrekening.code }} - {{ regel.grootboekrekening.naam }}
+                        </a>
+                    </td>
+                    <td class="text-end">{% if regel.debet %}{{ regel.debet|euro }}{% endif %}</td>
+                    <td class="text-end">{% if regel.credit %}{{ regel.credit|euro }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center text-muted py-4">
+        Nog geen journaalposten. Maak een factuur aan om boekingen te genereren.
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

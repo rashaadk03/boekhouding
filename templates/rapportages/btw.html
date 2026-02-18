@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}BTW-aangifte{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-percent"></i> BTW-aangifte</h2>
+    <a href="{{ url_for('rapportages.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Terug
+    </a>
+</div>
+
+<!-- Kwartaal selectie -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">Jaar</label>
+                <input type="number" name="jaar" class="form-control" value="{{ jaar }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Kwartaal</label>
+                <select name="kwartaal" class="form-select">
+                    <option value="1" {% if kwartaal == 1 %}selected{% endif %}>Q1 (jan-mrt)</option>
+                    <option value="2" {% if kwartaal == 2 %}selected{% endif %}>Q2 (apr-jun)</option>
+                    <option value="3" {% if kwartaal == 3 %}selected{% endif %}>Q3 (jul-sep)</option>
+                    <option value="4" {% if kwartaal == 4 %}selected{% endif %}>Q4 (okt-dec)</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Tonen</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h5 class="mb-3">Periode: Q{{ kwartaal }} {{ jaar }}</h5>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white"><strong>BTW op verkopen (af te dragen)</strong></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr><th>BTW-tarief</th><th class="text-end">Netto omzet</th><th class="text-end">BTW bedrag</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in verkoop_btw %}
+                        <tr>
+                            <td>{{ r.btw_percentage }}%</td>
+                            <td class="text-end">{{ (r.netto or 0)|euro }}</td>
+                            <td class="text-end">{{ (r.btw or 0)|euro }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted text-center">Geen verkopen in deze periode</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="2">Totaal af te dragen BTW</td>
+                            <td class="text-end">{{ totaal_verkoop_btw|euro }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white"><strong>BTW op inkopen (te vorderen)</strong></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr><th>BTW-tarief</th><th class="text-end">Netto inkopen</th><th class="text-end">BTW bedrag</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in inkoop_btw %}
+                        <tr>
+                            <td>{{ r.btw_percentage }}%</td>
+                            <td class="text-end">{{ (r.netto or 0)|euro }}</td>
+                            <td class="text-end">{{ (r.btw or 0)|euro }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted text-center">Geen inkopen in deze periode</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="2">Totaal te vorderen BTW</td>
+                            <td class="text-end">{{ totaal_inkoop_btw|euro }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-body text-center">
+        <h4>
+            Per saldo {% if af_te_dragen >= 0 %}af te dragen{% else %}te vorderen{% endif %}:
+            <span class="{% if af_te_dragen >= 0 %}text-danger{% else %}text-success{% endif %}">
+                {{ af_te_dragen|euro if af_te_dragen >= 0 else (-af_te_dragen)|euro }}
+            </span>
+        </h4>
+    </div>
+</div>
+{% endblock %}

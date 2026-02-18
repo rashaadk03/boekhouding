@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+    <span class="text-muted">Overzicht</span>
+</div>
+
+<!-- Statistieken -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Omzet dit jaar</div>
+                        <div class="stat-value text-success">{{ omzet_jaar|euro }}</div>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Kosten dit jaar</div>
+                        <div class="stat-value text-danger">{{ kosten_jaar|euro }}</div>
+                    </div>
+                    <div class="stat-icon bg-danger bg-opacity-10 text-danger">
+                        <i class="bi bi-graph-down-arrow"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Openstaande debiteuren</div>
+                        <div class="stat-value text-primary">{{ totaal_debiteuren|euro }}</div>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-people"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="stat-label">Openstaande crediteuren</div>
+                        <div class="stat-value text-warning">{{ totaal_crediteuren|euro }}</div>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tweede rij statistieken -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-label">Winst dit jaar</div>
+                <div class="stat-value {% if winst_jaar >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ winst_jaar|euro }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-label">Cashflow dit jaar</div>
+                <div class="stat-value {% if cashflow_jaar >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    {{ cashflow_jaar|euro }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-label">Klanten</div>
+                <div class="stat-value">{{ aantal_klanten }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body">
+                <div class="stat-label">Leveranciers</div>
+                <div class="stat-value">{{ aantal_leveranciers }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Grafieken -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><strong>Omzet & Kosten per maand</strong></div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="omzetGrafiek"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><strong>Cashflow per maand</strong></div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="cashflowGrafiek"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vervallen facturen waarschuwingen -->
+{% if vervallen_verkoop or vervallen_inkoop %}
+<div class="row g-4">
+    {% if vervallen_verkoop %}
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <i class="bi bi-exclamation-triangle"></i> Vervallen verkoopfacturen ({{ vervallen_verkoop|length }})
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th>Factuur</th><th>Klant</th><th>Vervaldatum</th><th class="text-end">Openstaand</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for f in vervallen_verkoop[:5] %}
+                        <tr>
+                            <td><a href="{{ url_for('verkoopfacturen.detail', id=f.id) }}">{{ f.factuurnummer }}</a></td>
+                            <td>{{ f.klant.naam }}</td>
+                            <td>{{ f.vervaldatum|datum }}</td>
+                            <td class="text-end text-danger">{{ f.openstaand_bedrag|euro }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if vervallen_verkoop|length > 5 %}
+                <div class="p-2 text-center">
+                    <a href="{{ url_for('verkoopfacturen.herinneringen') }}">Alle {{ vervallen_verkoop|length }} bekijken</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if vervallen_inkoop %}
+    <div class="col-md-6">
+        <div class="card border-warning">
+            <div class="card-header bg-warning">
+                <i class="bi bi-exclamation-triangle"></i> Vervallen inkoopfacturen ({{ vervallen_inkoop|length }})
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr><th>Factuur</th><th>Leverancier</th><th>Vervaldatum</th><th class="text-end">Openstaand</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for f in vervallen_inkoop[:5] %}
+                        <tr>
+                            <td><a href="{{ url_for('inkoopfacturen.detail', id=f.id) }}">{{ f.factuurnummer }}</a></td>
+                            <td>{{ f.leverancier.naam }}</td>
+                            <td>{{ f.vervaldatum|datum }}</td>
+                            <td class="text-end text-danger">{{ f.openstaand_bedrag|euro }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

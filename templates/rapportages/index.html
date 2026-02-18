@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Rapportages{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-bar-chart"></i> Rapportages</h2>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-clipboard-data fs-1 text-primary mb-3 d-block"></i>
+                <h5>Balans</h5>
+                <p class="text-muted">Overzicht van activa en passiva</p>
+                <a href="{{ url_for('rapportages.balans') }}" class="btn btn-primary">Bekijken</a>
+                <a href="{{ url_for('rapportages.export_csv', rapport='balans') }}" class="btn btn-outline-success btn-sm ms-1">CSV</a>
+                <a href="{{ url_for('rapportages.export_pdf', rapport='balans') }}" class="btn btn-outline-danger btn-sm ms-1">PDF</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up fs-1 text-success mb-3 d-block"></i>
+                <h5>Winst & Verlies</h5>
+                <p class="text-muted">Opbrengsten versus kosten</p>
+                <a href="{{ url_for('rapportages.winstverlies') }}" class="btn btn-success">Bekijken</a>
+                <a href="{{ url_for('rapportages.export_csv', rapport='winstverlies') }}" class="btn btn-outline-success btn-sm ms-1">CSV</a>
+                <a href="{{ url_for('rapportages.export_pdf', rapport='winstverlies') }}" class="btn btn-outline-danger btn-sm ms-1">PDF</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-percent fs-1 text-warning mb-3 d-block"></i>
+                <h5>BTW-aangifte</h5>
+                <p class="text-muted">BTW overzicht per kwartaal</p>
+                <a href="{{ url_for('rapportages.btw_aangifte') }}" class="btn btn-warning">Bekijken</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-people fs-1 text-info mb-3 d-block"></i>
+                <h5>Debiteuren</h5>
+                <p class="text-muted">Openstaande verkoopfacturen</p>
+                <a href="{{ url_for('verkoopfacturen.openstaand') }}" class="btn btn-info">Bekijken</a>
+                <a href="{{ url_for('rapportages.export_csv', rapport='debiteuren') }}" class="btn btn-outline-success btn-sm ms-1">CSV</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-truck fs-1 text-danger mb-3 d-block"></i>
+                <h5>Crediteuren</h5>
+                <p class="text-muted">Openstaande inkoopfacturen</p>
+                <a href="{{ url_for('inkoopfacturen.openstaand') }}" class="btn btn-danger">Bekijken</a>
+                <a href="{{ url_for('rapportages.export_csv', rapport='crediteuren') }}" class="btn btn-outline-success btn-sm ms-1">CSV</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-calculator fs-1 text-secondary mb-3 d-block"></i>
+                <h5>Proefbalans</h5>
+                <p class="text-muted">Controle debet/credit balans</p>
+                <a href="{{ url_for('grootboek.proefbalans') }}" class="btn btn-secondary">Bekijken</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

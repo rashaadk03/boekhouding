@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Winst & Verlies{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-graph-up"></i> Winst- en Verliesrekening</h2>
+    <div>
+        <a href="{{ url_for('rapportages.export_csv', rapport='winstverlies') }}" class="btn btn-outline-success me-2">
+            <i class="bi bi-file-earmark-spreadsheet"></i> CSV
+        </a>
+        <a href="{{ url_for('rapportages.export_pdf', rapport='winstverlies') }}" class="btn btn-outline-danger me-2">
+            <i class="bi bi-file-pdf"></i> PDF
+        </a>
+        <a href="{{ url_for('rapportages.index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Terug
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white"><strong>Opbrengsten</strong></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        {% for r in opbrengsten %}
+                        <tr>
+                            <td>{{ r.code }}</td>
+                            <td>{{ r.naam }}</td>
+                            <td class="text-end">{{ (-r.saldo)|euro }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted text-center">Geen opbrengsten</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="2">Totaal Opbrengsten</td>
+                            <td class="text-end">{{ totaal_opbrengsten|euro }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white"><strong>Kosten</strong></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        {% for r in kosten %}
+                        <tr>
+                            <td>{{ r.code }}</td>
+                            <td>{{ r.naam }}</td>
+                            <td class="text-end">{{ r.saldo|euro }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-muted text-center">Geen kosten</td></tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold">
+                            <td colspan="2">Totaal Kosten</td>
+                            <td class="text-end">{{ totaal_kosten|euro }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-body text-center">
+        <h4>Resultaat: <span class="{% if resultaat >= 0 %}text-success{% else %}text-danger{% endif %}">{{ resultaat|euro }}</span></h4>
+        <p class="text-muted mb-0">
+            {% if resultaat >= 0 %}Winst{% else %}Verlies{% endif %} over het lopende boekjaar
+        </p>
+    </div>
+</div>
+{% endblock %}

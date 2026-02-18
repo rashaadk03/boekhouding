@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Openstaande crediteuren{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-clock"></i> Openstaande crediteuren</h2>
+    <div>
+        <a href="{{ url_for('rapportages.export_csv', rapport='crediteuren') }}" class="btn btn-outline-success me-2">
+            <i class="bi bi-file-earmark-spreadsheet"></i> Export CSV
+        </a>
+        <a href="{{ url_for('inkoopfacturen.lijst') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Terug
+        </a>
+    </div>
+</div>
+
+<div class="alert alert-info">
+    Totaal openstaand: <strong>{{ totaal|euro }}</strong>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Factuurnummer</th>
+                    <th>Leverancier</th>
+                    <th>Factuurdatum</th>
+                    <th>Vervaldatum</th>
+                    <th>Status</th>
+                    <th class="text-end">Totaal</th>
+                    <th class="text-end">Betaald</th>
+                    <th class="text-end">Openstaand</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in facturen %}
+                <tr>
+                    <td><a href="{{ url_for('inkoopfacturen.detail', id=f.id) }}">{{ f.factuurnummer }}</a></td>
+                    <td>{{ f.leverancier.naam }}</td>
+                    <td>{{ f.factuurdatum|datum }}</td>
+                    <td>{{ f.vervaldatum|datum }}</td>
+                    <td><span class="badge badge-{{ f.status }}">{{ f.status|capitalize }}</span></td>
+                    <td class="text-end">{{ f.totaal|euro }}</td>
+                    <td class="text-end text-success">{{ f.betaald_bedrag|euro }}</td>
+                    <td class="text-end fw-bold {% if f.is_vervallen %}text-danger{% endif %}">{{ f.openstaand_bedrag|euro }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr class="fw-bold">
+                    <td colspan="7" class="text-end">Totaal openstaand:</td>
+                    <td class="text-end">{{ totaal|euro }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+{% endblock %}

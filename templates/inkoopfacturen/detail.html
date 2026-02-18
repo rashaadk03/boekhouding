@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Inkoopfactuur {{ factuur.factuurnummer }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-cart"></i> {{ factuur.factuurnummer }}</h2>
+    <div>
+        {% if factuur.status == 'ontvangen' %}
+        <form method="post" action="{{ url_for('inkoopfacturen.goedkeuren', id=factuur.id) }}" class="d-inline">
+            <button type="submit" class="btn btn-info">
+                <i class="bi bi-check-circle"></i> Goedkeuren
+            </button>
+        </form>
+        {% endif %}
+        {% if factuur.status in ['ontvangen', 'goedgekeurd', 'vervallen'] %}
+        <a href="{{ url_for('betalingen.nieuw', factuur_type='inkoop', factuur_id=factuur.id) }}" class="btn btn-success">
+            <i class="bi bi-credit-card"></i> Betaling registreren
+        </a>
+        {% endif %}
+        <form method="post" action="{{ url_for('inkoopfacturen.verwijder', id=factuur.id) }}" class="d-inline"
+              onsubmit="return confirm('Weet u zeker dat u deze factuur wilt verwijderen?')">
+            <button type="submit" class="btn btn-outline-danger">
+                <i class="bi bi-trash"></i> Verwijderen
+            </button>
+        </form>
+        <a href="{{ url_for('inkoopfacturen.lijst') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Terug
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <strong>Factuurdetails</strong>
+                <span class="badge badge-{{ factuur.status }} fs-6">{{ factuur.status|capitalize }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Leverancier</h6>
+                        <strong>{{ factuur.leverancier.naam }}</strong><br>
+                        {% if factuur.leverancier.adres %}{{ factuur.leverancier.adres }}<br>{% endif %}
+                        {% if factuur.leverancier.postcode %}{{ factuur.leverancier.postcode }} {{ factuur.leverancier.plaats }}<br>{% endif %}
+                        {% if factuur.leverancier.btw_nummer %}BTW: {{ factuur.leverancier.btw_nummer }}{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-sm">
+                            <tr><td class="text-muted">Factuurnummer</td><td><strong>{{ factuur.factuurnummer }}</strong></td></tr>
+                            <tr><td class="text-muted">Factuurdatum</td><td>{{ factuur.factuurdatum|datum }}</td></tr>
+                            <tr><td class="text-muted">Vervaldatum</td><td>{{ factuur.vervaldatum|datum }}</td></tr>
+                            <tr><td class="text-muted">Valuta</td><td>{{ factuur.valuta }}</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Omschrijving</th>
+                            <th class="text-end">Aantal</th>
+                            <th class="text-end">Prijs</th>
+                            <th class="text-end">BTW %</th>
+                            <th class="text-end">Totaal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for regel in factuur.regels %}
+                        <tr>
+                            <td>{{ regel.omschrijving }}</td>
+                            <td class="text-end">{{ regel.aantal }}</td>
+                            <td class="text-end">{{ regel.prijs_per_stuk|euro }}</td>
+                            <td class="text-end">{{ regel.btw_percentage }}%</td>
+                            <td class="text-end">{{ regel.totaal|euro }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr><td colspan="4" class="text-end">Subtotaal:</td><td class="text-end">{{ factuur.subtotaal|euro }}</td></tr>
+                        <tr><td colspan="4" class="text-end">BTW:</td><td class="text-end">{{ factuur.btw_bedrag|euro }}</td></tr>
+                        <tr class="fw-bold fs-5"><td colspan="4" class="text-end">Totaal:</td><td class="text-end">{{ factuur.totaal|euro }}</td></tr>
+                    </tfoot>
+                </table>
+
+                {% if factuur.opmerkingen %}
+                <div class="mt-3 p-3 bg-light rounded">
+                    <strong>Opmerkingen:</strong><br>{{ factuur.opmerkingen }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header"><strong>Betalingsstatus</strong></div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Betaald</span>
+                        <span>{{ factuur.betaald_bedrag|euro }} / {{ factuur.totaal|euro }}</span>
+                    </div>
+                    {% set pct = (factuur.betaald_bedrag / factuur.totaal * 100) if factuur.totaal > 0 else 0 %}
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: {{ pct }}%">{{ pct|round(0) }}%</div>
+                    </div>
+                </div>
+                <table class="table table-sm">
+                    <tr><td>Totaalbedrag:</td><td class="text-end">{{ factuur.totaal|euro }}</td></tr>
+                    <tr><td>Betaald:</td><td class="text-end text-success">{{ factuur.betaald_bedrag|euro }}</td></tr>
+                    <tr class="fw-bold"><td>Openstaand:</td><td class="text-end {% if factuur.openstaand_bedrag > 0 %}text-danger{% endif %}">{{ factuur.openstaand_bedrag|euro }}</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

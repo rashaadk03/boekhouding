@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Grootboek{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-book"></i> Grootboekrekeningen</h2>
+    <div>
+        <a href="{{ url_for('grootboek.journaal') }}" class="btn btn-outline-primary me-2">
+            <i class="bi bi-journal-text"></i> Journaal
+        </a>
+        <a href="{{ url_for('grootboek.proefbalans') }}" class="btn btn-outline-info">
+            <i class="bi bi-calculator"></i> Proefbalans
+        </a>
+    </div>
+</div>
+
+<div class="mb-3">
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('grootboek.rekeningen') }}" class="btn btn-sm {% if not type_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">Alle</a>
+        <a href="{{ url_for('grootboek.rekeningen', type='activa') }}" class="btn btn-sm {% if type_filter == 'activa' %}btn-primary{% else %}btn-outline-primary{% endif %}">Activa</a>
+        <a href="{{ url_for('grootboek.rekeningen', type='passiva') }}" class="btn btn-sm {% if type_filter == 'passiva' %}btn-primary{% else %}btn-outline-primary{% endif %}">Passiva</a>
+        <a href="{{ url_for('grootboek.rekeningen', type='opbrengsten') }}" class="btn btn-sm {% if type_filter == 'opbrengsten' %}btn-primary{% else %}btn-outline-primary{% endif %}">Opbrengsten</a>
+        <a href="{{ url_for('grootboek.rekeningen', type='kosten') }}" class="btn btn-sm {% if type_filter == 'kosten' %}btn-primary{% else %}btn-outline-primary{% endif %}">Kosten</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Naam</th>
+                    <th>Type</th>
+                    <th class="text-end">Debet</th>
+                    <th class="text-end">Credit</th>
+                    <th class="text-end">Saldo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rek in rekeningen %}
+                <tr>
+                    <td><strong>{{ rek.code }}</strong></td>
+                    <td>
+                        <a href="{{ url_for('grootboek.rekening_detail', id=rek.id) }}">{{ rek.naam }}</a>
+                    </td>
+                    <td><span class="badge bg-secondary">{{ rek.type|capitalize }}</span></td>
+                    <td class="text-end">{{ rek.totaal_debet|euro }}</td>
+                    <td class="text-end">{{ rek.totaal_credit|euro }}</td>
+                    <td class="text-end fw-bold {% if rek.saldo > 0 %}text-primary{% elif rek.saldo < 0 %}text-danger{% endif %}">
+                        {{ rek.saldo|euro }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

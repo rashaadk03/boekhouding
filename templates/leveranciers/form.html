@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{% if leverancier %}Leverancier bewerken{% else %}Nieuwe leverancier{% endif %}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>
+        <i class="bi bi-{% if leverancier %}pencil{% else %}plus-lg{% endif %}"></i>
+        {% if leverancier %}Leverancier bewerken{% else %}Nieuwe leverancier{% endif %}
+    </h2>
+    <a href="{{ url_for('leveranciers.lijst') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Terug
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post" action="{% if leverancier %}{{ url_for('leveranciers.bewerk', id=leverancier.id) }}{% else %}{{ url_for('leveranciers.nieuw') }}{% endif %}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Bedrijfsnaam *</label>
+                    <input type="text" name="naam" class="form-control" required value="{{ leverancier.naam if leverancier else '' }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ leverancier.email if leverancier else '' }}">
+                </div>
+                <div class="col-md-12">
+                    <label class="form-label">Adres</label>
+                    <input type="text" name="adres" class="form-control" value="{{ leverancier.adres if leverancier else '' }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Postcode</label>
+                    <input type="text" name="postcode" class="form-control" value="{{ leverancier.postcode if leverancier else '' }}">
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Plaats</label>
+                    <input type="text" name="plaats" class="form-control" value="{{ leverancier.plaats if leverancier else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Land</label>
+                    <input type="text" name="land" class="form-control" value="{{ leverancier.land if leverancier else 'Nederland' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">KvK-nummer</label>
+                    <input type="text" name="kvk_nummer" class="form-control" value="{{ leverancier.kvk_nummer if leverancier else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">BTW-nummer</label>
+                    <input type="text" name="btw_nummer" class="form-control" value="{{ leverancier.btw_nummer if leverancier else '' }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Telefoon</label>
+                    <input type="text" name="telefoon" class="form-control" value="{{ leverancier.telefoon if leverancier else '' }}">
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> {% if leverancier %}Opslaan{% else %}Aanmaken{% endif %}
+                </button>
+                <a href="{{ url_for('leveranciers.lijst') }}" class="btn btn-outline-secondary ms-2">Annuleren</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
