@@ -1,7 +1,9 @@
 from flask import Flask
+from flask_login import LoginManager
 from config import Config
-from models import db, init_standaard_data
+from models import db, init_standaard_data, Gebruiker
 from routes import all_blueprints
+from routes.auth import auth_bp
 
 
 def create_app():
@@ -10,6 +12,17 @@ def create_app():
 
     db.init_app(app)
 
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Log in om deze pagina te bekijken.'
+    login_manager.login_message_category = 'warning'
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return Gebruiker.query.get(int(user_id))
+
+    app.register_blueprint(auth_bp)
     for bp in all_blueprints:
         app.register_blueprint(bp)
 

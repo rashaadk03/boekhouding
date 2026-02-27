@@ -1,6 +1,7 @@
 import csv
 import io
 from flask import Blueprint, render_template, request, Response, send_file
+from flask_login import login_required
 from models import (db, Grootboekrekening, JournaalpostRegel, Verkoopfactuur,
                      VerkoopfactuurRegel, Inkoopfactuur, InkoopfactuurRegel)
 from sqlalchemy import func, extract
@@ -12,6 +13,12 @@ except (ImportError, OSError):
     WEASYPRINT_BESCHIKBAAR = False
 
 rapportages_bp = Blueprint('rapportages', __name__, url_prefix='/rapportages')
+
+
+@rapportages_bp.before_request
+@login_required
+def vereist_login():
+    pass
 
 
 def get_rekening_saldo(code):

@@ -1,9 +1,16 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required
 from models import (db, Betaling, Verkoopfactuur, Inkoopfactuur,
                      Journaalpost, JournaalpostRegel, Grootboekrekening)
 from datetime import date
 
 betalingen_bp = Blueprint('betalingen', __name__, url_prefix='/betalingen')
+
+
+@betalingen_bp.before_request
+@login_required
+def vereist_login():
+    pass
 
 
 def maak_journaalpost_betaling(betaling):

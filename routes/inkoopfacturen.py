@@ -1,10 +1,17 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required
 from models import (db, Inkoopfactuur, InkoopfactuurRegel, Leverancier, Valuta,
                      Grootboekrekening, Journaalpost, JournaalpostRegel)
 from utils.btw import bereken_btw
 from datetime import date, timedelta
 
 inkoopfacturen_bp = Blueprint('inkoopfacturen', __name__, url_prefix='/inkoop')
+
+
+@inkoopfacturen_bp.before_request
+@login_required
+def vereist_login():
+    pass
 
 
 def maak_journaalpost_inkoop(factuur):

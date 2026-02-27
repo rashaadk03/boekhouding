@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, send_file
+from flask_login import login_required
 from models import (db, Verkoopfactuur, VerkoopfactuurRegel, Klant, Valuta,
                      Grootboekrekening, Journaalpost, JournaalpostRegel)
 from utils.btw import bereken_btw
@@ -6,6 +7,12 @@ from utils.pdf import genereer_factuur_pdf
 from datetime import date, timedelta
 
 verkoopfacturen_bp = Blueprint('verkoopfacturen', __name__, url_prefix='/verkoop')
+
+
+@verkoopfacturen_bp.before_request
+@login_required
+def vereist_login():
+    pass
 
 
 def genereer_factuurnummer():

@@ -58,6 +58,12 @@
                         <i class="bi bi-bar-chart"></i> Rapportages
                     </a>
                 </li>
+                <li class="nav-divider"></li>
+                <li class="nav-item mt-auto">
+                    <a class="nav-link" href="{{ url_for('auth.logout') }}">
+                        <i class="bi bi-box-arrow-left"></i> Uitloggen ({{ current_user.gebruikersnaam }})
+                    </a>
+                </li>
             </ul>
         </nav>
 

@@ -1,7 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required
 from models import db, Leverancier
 
 leveranciers_bp = Blueprint('leveranciers', __name__, url_prefix='/leveranciers')
+
+
+@leveranciers_bp.before_request
+@login_required
+def vereist_login():
+    pass
 
 
 @leveranciers_bp.route('/')

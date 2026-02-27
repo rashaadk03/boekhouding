@@ -1,7 +1,28 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, date, timedelta
 
 db = SQLAlchemy()
+
+
+class Gebruiker(UserMixin, db.Model):
+    __tablename__ = 'gebruiker'
+    id = db.Column(db.Integer, primary_key=True)
+    gebruikersnaam = db.Column(db.String(80), unique=True, nullable=False)
+    wachtwoord_hash = db.Column(db.String(256), nullable=False)
+    naam = db.Column(db.String(200))
+    is_admin = db.Column(db.Boolean, default=False)
+    aangemaakt_op = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def set_wachtwoord(self, wachtwoord):
+        self.wachtwoord_hash = generate_password_hash(wachtwoord, method='pbkdf2:sha256')
+
+    def check_wachtwoord(self, wachtwoord):
+        return check_password_hash(self.wachtwoord_hash, wachtwoord)
+
+    def __repr__(self):
+        return f'<Gebruiker {self.gebruikersnaam}>'
 
 
 class Klant(db.Model):
@@ -255,6 +276,15 @@ def init_standaard_data():
         ]
         for code, naam, type_ in rekeningen:
             db.session.add(Grootboekrekening(code=code, naam=naam, type=type_))
+
+    if Gebruiker.query.first() is None:
+        admin = Gebruiker(
+            gebruikersnaam='admin',
+            naam='Administrator',
+            is_admin=True
+        )
+        admin.set_wachtwoord('admin123')
+        db.session.add(admin)
 
     if Valuta.query.first() is None:
         valutas = [

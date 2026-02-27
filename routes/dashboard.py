@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, jsonify
+from flask_login import login_required
 from models import db, Verkoopfactuur, Inkoopfactuur, Betaling, Klant, Leverancier
 from datetime import date, timedelta
 from sqlalchemy import func, extract
@@ -7,6 +8,7 @@ dashboard_bp = Blueprint('dashboard', __name__)
 
 
 @dashboard_bp.route('/')
+@login_required
 def index():
     vandaag = date.today()
     begin_jaar = date(vandaag.year, 1, 1)
@@ -70,6 +72,7 @@ def index():
 
 
 @dashboard_bp.route('/api/omzet-per-maand')
+@login_required
 def omzet_per_maand():
     jaar = date.today().year
     data = []
@@ -88,6 +91,7 @@ def omzet_per_maand():
 
 
 @dashboard_bp.route('/api/cashflow-per-maand')
+@login_required
 def cashflow_per_maand():
     jaar = date.today().year
     data = []

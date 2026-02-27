@@ -1,7 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required
 from models import db, Klant
 
 klanten_bp = Blueprint('klanten', __name__, url_prefix='/klanten')
+
+
+@klanten_bp.before_request
+@login_required
+def vereist_login():
+    pass
 
 
 @klanten_bp.route('/')

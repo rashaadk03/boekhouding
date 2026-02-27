@@ -1,8 +1,15 @@
 from flask import Blueprint, render_template, request
+from flask_login import login_required
 from models import db, Grootboekrekening, Journaalpost, JournaalpostRegel
 from sqlalchemy import func
 
 grootboek_bp = Blueprint('grootboek', __name__, url_prefix='/grootboek')
+
+
+@grootboek_bp.before_request
+@login_required
+def vereist_login():
+    pass
 
 
 @grootboek_bp.route('/')
