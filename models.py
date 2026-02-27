@@ -278,12 +278,13 @@ def init_standaard_data():
             db.session.add(Grootboekrekening(code=code, naam=naam, type=type_))
 
     if Gebruiker.query.first() is None:
+        import os
         admin = Gebruiker(
-            gebruikersnaam='Rashaadk03',
+            gebruikersnaam=os.environ.get('ADMIN_USER', 'admin'),
             naam='Administrator',
             is_admin=True
         )
-        admin.set_wachtwoord('Tandpasta21.')
+        admin.set_wachtwoord(os.environ.get('ADMIN_PASSWORD', 'changeme'))
         db.session.add(admin)
 
     if Valuta.query.first() is None:
