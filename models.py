@@ -279,11 +279,11 @@ def init_standaard_data():
 
     if Gebruiker.query.first() is None:
         admin = Gebruiker(
-            gebruikersnaam='admin',
+            gebruikersnaam='Rashaadk03',
             naam='Administrator',
             is_admin=True
         )
-        admin.set_wachtwoord('admin123')
+        admin.set_wachtwoord('Tandpasta21.')
         db.session.add(admin)
 
     if Valuta.query.first() is None:
