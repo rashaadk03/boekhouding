@@ -92,7 +92,7 @@
     </div>
 
     <div class="col-md-4">
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-header"><strong>Betalingsstatus</strong></div>
             <div class="card-body">
                 <div class="mb-3">
@@ -110,6 +110,32 @@
                     <tr><td>Betaald:</td><td class="text-end text-success">{{ factuur.betaald_bedrag|euro }}</td></tr>
                     <tr class="fw-bold"><td>Openstaand:</td><td class="text-end {% if factuur.openstaand_bedrag > 0 %}text-danger{% endif %}">{{ factuur.openstaand_bedrag|euro }}</td></tr>
                 </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><strong><i class="bi bi-file-pdf"></i> Factuurbestand</strong></div>
+            <div class="card-body">
+                {% if factuur.pdf_bestand %}
+                    <p class="mb-2">
+                        <i class="bi bi-file-earmark-check text-success"></i>
+                        <strong>{{ factuur.pdf_bestand }}</strong>
+                    </p>
+                    <a href="{{ url_for('inkoopfacturen.download_pdf', id=factuur.id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                        <i class="bi bi-download"></i> Downloaden
+                    </a>
+                {% else %}
+                    <p class="text-muted mb-2">Geen bestand geüpload</p>
+                {% endif %}
+                <hr>
+                <form method="post" action="{{ url_for('inkoopfacturen.upload_pdf', id=factuur.id) }}" enctype="multipart/form-data">
+                    <div class="mb-2">
+                        <input type="file" name="pdf_bestand" class="form-control form-control-sm" accept=".pdf,.png,.jpg,.jpeg" required>
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary w-100">
+                        <i class="bi bi-upload"></i> {% if factuur.pdf_bestand %}Vervangen{% else %}Uploaden{% endif %}
+                    </button>
+                </form>
             </div>
         </div>
     </div>

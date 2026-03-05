@@ -8,7 +8,7 @@
     </a>
 </div>
 
-<form method="post" action="{{ url_for('inkoopfacturen.nieuw') }}">
+<form method="post" action="{{ url_for('inkoopfacturen.nieuw') }}" enctype="multipart/form-data">
     <div class="card mb-4">
         <div class="card-header"><strong>Factuurgegevens</strong></div>
         <div class="card-body">
@@ -109,8 +109,17 @@
 
     <div class="card mb-4">
         <div class="card-body">
-            <label class="form-label">Opmerkingen</label>
-            <textarea name="opmerkingen" class="form-control" rows="3"></textarea>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Opmerkingen</label>
+                    <textarea name="opmerkingen" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label"><i class="bi bi-file-pdf"></i> Factuur PDF uploaden</label>
+                    <input type="file" name="pdf_bestand" class="form-control" accept=".pdf,.png,.jpg,.jpeg">
+                    <small class="text-muted">PDF, PNG of JPG (max 16 MB)</small>
+                </div>
+            </div>
         </div>
     </div>
 

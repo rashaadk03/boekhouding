@@ -155,6 +155,7 @@ class Inkoopfactuur(db.Model):
     totaal = db.Column(db.Float, default=0.0)
     valuta = db.Column(db.String(3), default='EUR')
     opmerkingen = db.Column(db.Text)
+    pdf_bestand = db.Column(db.String(500))
     aangemaakt_op = db.Column(db.DateTime, default=datetime.utcnow)
     regels = db.relationship('InkoopfactuurRegel', backref='factuur', lazy=True, cascade='all, delete-orphan')
 

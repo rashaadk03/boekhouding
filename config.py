@@ -15,3 +15,5 @@ class Config:
     BEDRIJFSKVK = '12345678'
     BEDRIJFSBTW = 'NL123456789B01'
     BEDRIJFSIBAN = 'NL00BANK0123456789'
+    UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB max

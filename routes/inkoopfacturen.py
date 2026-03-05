@@ -1,9 +1,17 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+import os
+from flask import Blueprint, render_template, request, redirect, url_for, flash, send_from_directory, current_app
 from flask_login import login_required
+from werkzeug.utils import secure_filename
 from models import (db, Inkoopfactuur, InkoopfactuurRegel, Leverancier, Valuta,
                      Grootboekrekening, Journaalpost, JournaalpostRegel)
 from utils.btw import bereken_btw
 from datetime import date, timedelta
+
+TOEGESTANE_EXTENSIES = {'pdf', 'png', 'jpg', 'jpeg'}
+
+
+def toegestaan_bestand(bestandsnaam):
+    return '.' in bestandsnaam and bestandsnaam.rsplit('.', 1)[1].lower() in TOEGESTANE_EXTENSIES
 
 inkoopfacturen_bp = Blueprint('inkoopfacturen', __name__, url_prefix='/inkoop')
 
@@ -128,6 +136,15 @@ def nieuw():
         factuur.btw_bedrag = round(btw_totaal, 2)
         factuur.totaal = round(subtotaal + btw_totaal, 2)
 
+        # PDF upload
+        bestand = request.files.get('pdf_bestand')
+        if bestand and bestand.filename and toegestaan_bestand(bestand.filename):
+            upload_map = current_app.config['UPLOAD_FOLDER']
+            os.makedirs(upload_map, exist_ok=True)
+            bestandsnaam = secure_filename(f"{factuurnummer}_{bestand.filename}")
+            bestand.save(os.path.join(upload_map, bestandsnaam))
+            factuur.pdf_bestand = bestandsnaam
+
         db.session.add(factuur)
         maak_journaalpost_inkoop(factuur)
         db.session.commit()
@@ -167,6 +184,45 @@ def verwijder(id):
     db.session.commit()
     flash(f'Inkoopfactuur {nr} is verwijderd.', 'success')
     return redirect(url_for('inkoopfacturen.lijst'))
+
+
+@inkoopfacturen_bp.route('/<int:id>/upload', methods=['POST'])
+def upload_pdf(id):
+    factuur = Inkoopfactuur.query.get_or_404(id)
+    bestand = request.files.get('pdf_bestand')
+    if not bestand or not bestand.filename:
+        flash('Geen bestand geselecteerd.', 'danger')
+        return redirect(url_for('inkoopfacturen.detail', id=id))
+
+    if not toegestaan_bestand(bestand.filename):
+        flash('Alleen PDF, PNG en JPG bestanden zijn toegestaan.', 'danger')
+        return redirect(url_for('inkoopfacturen.detail', id=id))
+
+    upload_map = current_app.config['UPLOAD_FOLDER']
+    os.makedirs(upload_map, exist_ok=True)
+
+    # Verwijder oud bestand als dat bestaat
+    if factuur.pdf_bestand:
+        oud_pad = os.path.join(upload_map, factuur.pdf_bestand)
+        if os.path.exists(oud_pad):
+            os.remove(oud_pad)
+
+    bestandsnaam = secure_filename(f"{factuur.factuurnummer}_{bestand.filename}")
+    bestand.save(os.path.join(upload_map, bestandsnaam))
+    factuur.pdf_bestand = bestandsnaam
+    db.session.commit()
+    flash('Factuurbestand is geüpload.', 'success')
+    return redirect(url_for('inkoopfacturen.detail', id=id))
+
+
+@inkoopfacturen_bp.route('/<int:id>/download')
+def download_pdf(id):
+    factuur = Inkoopfactuur.query.get_or_404(id)
+    if not factuur.pdf_bestand:
+        flash('Geen bestand beschikbaar.', 'warning')
+        return redirect(url_for('inkoopfacturen.detail', id=id))
+    upload_map = current_app.config['UPLOAD_FOLDER']
+    return send_from_directory(upload_map, factuur.pdf_bestand)
 
 
 @inkoopfacturen_bp.route('/openstaand')
