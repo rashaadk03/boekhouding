@@ -166,6 +166,57 @@ def detail(id):
     return render_template('inkoopfacturen/detail.html', factuur=factuur)
 
 
+@inkoopfacturen_bp.route('/<int:id>/bewerk', methods=['GET', 'POST'])
+def bewerk(id):
+    factuur = Inkoopfactuur.query.get_or_404(id)
+    if request.method == 'POST':
+        factuur.leverancier_id = request.form['leverancier_id']
+        factuur.factuurnummer = request.form['factuurnummer']
+        factuur.factuurdatum = date.fromisoformat(request.form['factuurdatum'])
+        factuur.vervaldatum = date.fromisoformat(request.form['vervaldatum'])
+        factuur.valuta = request.form.get('valuta', 'EUR')
+        factuur.opmerkingen = request.form.get('opmerkingen', '')
+
+        regel_ids = request.form.getlist('regel_id[]')
+        omschrijvingen = request.form.getlist('omschrijving[]')
+        aantallen = request.form.getlist('aantal[]')
+        prijzen = request.form.getlist('prijs_per_stuk[]')
+        btw_percentages = request.form.getlist('btw_percentage[]')
+        gb_rekeningen = request.form.getlist('grootboekrekening_id[]')
+
+        subtotaal = 0
+        btw_totaal = 0
+        for i in range(len(regel_ids)):
+            regel = InkoopfactuurRegel.query.get(int(regel_ids[i]))
+            if not regel:
+                continue
+            regel.omschrijving = omschrijvingen[i]
+            regel.aantal = float(aantallen[i])
+            regel.prijs_per_stuk = float(prijzen[i])
+            regel.btw_percentage = float(btw_percentages[i])
+            regel.grootboekrekening_id = int(gb_rekeningen[i]) if gb_rekeningen[i] else None
+            netto = regel.aantal * regel.prijs_per_stuk
+            btw = bereken_btw(netto, regel.btw_percentage)
+            regel.totaal = netto + btw
+            subtotaal += netto
+            btw_totaal += btw
+
+        factuur.subtotaal = round(subtotaal, 2)
+        factuur.btw_bedrag = round(btw_totaal, 2)
+        factuur.totaal = round(subtotaal + btw_totaal, 2)
+
+        db.session.commit()
+        flash(f'Inkoopfactuur {factuur.factuurnummer} is bijgewerkt.', 'success')
+        return redirect(url_for('inkoopfacturen.detail', id=id))
+
+    leveranciers = Leverancier.query.order_by(Leverancier.naam).all()
+    valutas = Valuta.query.order_by(Valuta.code).all()
+    rekeningen = Grootboekrekening.query.filter_by(type='kosten').order_by(Grootboekrekening.code).all()
+    return render_template('inkoopfacturen/bewerk.html',
+                           factuur=factuur, leveranciers=leveranciers,
+                           valutas=valutas, rekeningen=rekeningen)
+
+
 @inkoopfacturen_bp.route('/<int:id>/goedkeuren', methods=['POST'])
 def goedkeuren(id):
     factuur = Inkoopfactuur.query.get_or_404(id)

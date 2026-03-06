@@ -16,6 +16,9 @@
             <i class="bi bi-credit-card"></i> Betaling registreren
         </a>
         {% endif %}
+        <a href="{{ url_for('inkoopfacturen.bewerk', id=factuur.id) }}" class="btn btn-outline-primary">
+            <i class="bi bi-pencil"></i> Bewerken
+        </a>
         <form method="post" action="{{ url_for('inkoopfacturen.verwijder', id=factuur.id) }}" class="d-inline"
               onsubmit="return confirm('Weet u zeker dat u deze factuur wilt verwijderen?')">
             <button type="submit" class="btn btn-outline-danger">
@@ -58,6 +61,7 @@
                     <thead>
                         <tr>
                             <th>Omschrijving</th>
+                            <th>Grootboek</th>
                             <th class="text-end">Aantal</th>
                             <th class="text-end">Prijs</th>
                             <th class="text-end">BTW %</th>
@@ -68,6 +72,7 @@
                         {% for regel in factuur.regels %}
                         <tr>
                             <td>{{ regel.omschrijving }}</td>
+                            <td><small class="text-muted">{% if regel.grootboekrekening %}{{ regel.grootboekrekening.code }} - {{ regel.grootboekrekening.naam }}{% else %}-{% endif %}</small></td>
                             <td class="text-end">{{ regel.aantal }}</td>
                             <td class="text-end">{{ regel.prijs_per_stuk|euro }}</td>
                             <td class="text-end">{{ regel.btw_percentage }}%</td>
@@ -76,9 +81,9 @@
                         {% endfor %}
                     </tbody>
                     <tfoot>
-                        <tr><td colspan="4" class="text-end">Subtotaal:</td><td class="text-end">{{ factuur.subtotaal|euro }}</td></tr>
-                        <tr><td colspan="4" class="text-end">BTW:</td><td class="text-end">{{ factuur.btw_bedrag|euro }}</td></tr>
-                        <tr class="fw-bold fs-5"><td colspan="4" class="text-end">Totaal:</td><td class="text-end">{{ factuur.totaal|euro }}</td></tr>
+                        <tr><td colspan="5" class="text-end">Subtotaal:</td><td class="text-end">{{ factuur.subtotaal|euro }}</td></tr>
+                        <tr><td colspan="5" class="text-end">BTW:</td><td class="text-end">{{ factuur.btw_bedrag|euro }}</td></tr>
+                        <tr class="fw-bold fs-5"><td colspan="5" class="text-end">Totaal:</td><td class="text-end">{{ factuur.totaal|euro }}</td></tr>
                     </tfoot>
                 </table>
 
