@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Verkoopfactuur bewerken - {{ factuur.factuurnummer }}{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-pencil"></i> {{ factuur.factuurnummer }} bewerken</h2>
+    <a href="{{ url_for('verkoopfacturen.detail', id=factuur.id) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Terug
+    </a>
+</div>
+
+<form method="post" action="{{ url_for('verkoopfacturen.bewerk', id=factuur.id) }}">
+    <div class="card mb-4">
+        <div class="card-header"><strong>Factuurgegevens</strong></div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Klant</label>
+                    <select name="klant_id" class="form-select" required>
+                        {% for k in klanten %}
+                        <option value="{{ k.id }}" {% if k.id == factuur.klant_id %}selected{% endif %}>{{ k.naam }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Factuurnummer</label>
+                    <input type="text" class="form-control" value="{{ factuur.factuurnummer }}" disabled>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Factuurdatum</label>
+                    <input type="date" name="factuurdatum" class="form-control" value="{{ factuur.factuurdatum }}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Vervaldatum</label>
+                    <input type="date" name="vervaldatum" class="form-control" value="{{ factuur.vervaldatum }}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Valuta</label>
+                    <select name="valuta" class="form-select">
+                        {% for v in valutas %}
+                        <option value="{{ v.code }}" {% if v.code == factuur.valuta %}selected{% endif %}>{{ v.code }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header"><strong>Factuurregels</strong></div>
+        <div class="card-body">
+            {% for regel in factuur.regels %}
+            <div class="factuur-regel">
+                <input type="hidden" name="regel_id[]" value="{{ regel.id }}">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label">Omschrijving</label>
+                        <input type="text" name="omschrijving[]" class="form-control" value="{{ regel.omschrijving }}" required>
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label">Aantal</label>
+                        <input type="number" name="aantal[]" class="form-control regel-aantal" step="0.01" value="{{ regel.aantal }}" min="0">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Prijs per stuk</label>
+                        <input type="number" name="prijs_per_stuk[]" class="form-control regel-prijs" step="0.01" value="{{ regel.prijs_per_stuk }}" min="0">
+                    </div>
+                    <div class="col-md-1">
+                        <label class="form-label">BTW %</label>
+                        <select name="btw_percentage[]" class="form-select regel-btw">
+                            <option value="21" {% if regel.btw_percentage == 21.0 %}selected{% endif %}>21%</option>
+                            <option value="9" {% if regel.btw_percentage == 9.0 %}selected{% endif %}>9%</option>
+                            <option value="0" {% if regel.btw_percentage == 0.0 %}selected{% endif %}>0%</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Grootboekrekening</label>
+                        <select name="grootboekrekening_id[]" class="form-select">
+                            <option value="">-</option>
+                            {% for r in rekeningen %}
+                            <option value="{{ r.id }}" {% if regel.grootboekrekening_id == r.id %}selected{% endif %}>{{ r.code }} - {{ r.naam }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="regel-totaal fw-bold">{{ regel.totaal|euro }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row justify-content-end">
+                <div class="col-md-4">
+                    <table class="table table-sm mb-0">
+                        <tr><td>Subtotaal:</td><td class="text-end" id="subtotaal">{{ factuur.subtotaal|euro }}</td></tr>
+                        <tr><td>BTW:</td><td class="text-end" id="btw-totaal">{{ factuur.btw_bedrag|euro }}</td></tr>
+                        <tr class="fw-bold fs-5"><td>Totaal:</td><td class="text-end" id="totaal">{{ factuur.totaal|euro }}</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <label class="form-label">Opmerkingen</label>
+            <textarea name="opmerkingen" class="form-control" rows="3">{{ factuur.opmerkingen or '' }}</textarea>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg">
+        <i class="bi bi-check-lg"></i> Opslaan
+    </button>
+    <a href="{{ url_for('verkoopfacturen.detail', id=factuur.id) }}" class="btn btn-outline-secondary btn-lg ms-2">Annuleren</a>
+</form>
+{% endblock %}

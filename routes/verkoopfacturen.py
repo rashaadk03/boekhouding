@@ -160,6 +160,56 @@ def detail(id):
     return render_template('verkoopfacturen/detail.html', factuur=factuur)
 
 
+@verkoopfacturen_bp.route('/<int:id>/bewerk', methods=['GET', 'POST'])
+def bewerk(id):
+    factuur = Verkoopfactuur.query.get_or_404(id)
+    if request.method == 'POST':
+        factuur.klant_id = request.form['klant_id']
+        factuur.factuurdatum = date.fromisoformat(request.form['factuurdatum'])
+        factuur.vervaldatum = date.fromisoformat(request.form['vervaldatum'])
+        factuur.valuta = request.form.get('valuta', 'EUR')
+        factuur.opmerkingen = request.form.get('opmerkingen', '')
+
+        regel_ids = request.form.getlist('regel_id[]')
+        omschrijvingen = request.form.getlist('omschrijving[]')
+        aantallen = request.form.getlist('aantal[]')
+        prijzen = request.form.getlist('prijs_per_stuk[]')
+        btw_percentages = request.form.getlist('btw_percentage[]')
+        gb_rekeningen = request.form.getlist('grootboekrekening_id[]')
+
+        subtotaal = 0
+        btw_totaal = 0
+        for i in range(len(regel_ids)):
+            regel = VerkoopfactuurRegel.query.get(int(regel_ids[i]))
+            if not regel:
+                continue
+            regel.omschrijving = omschrijvingen[i]
+            regel.aantal = float(aantallen[i])
+            regel.prijs_per_stuk = float(prijzen[i])
+            regel.btw_percentage = float(btw_percentages[i])
+            regel.grootboekrekening_id = int(gb_rekeningen[i]) if gb_rekeningen[i] else None
+            netto = regel.aantal * regel.prijs_per_stuk
+            btw = bereken_btw(netto, regel.btw_percentage)
+            regel.totaal = netto + btw
+            subtotaal += netto
+            btw_totaal += btw
+
+        factuur.subtotaal = round(subtotaal, 2)
+        factuur.btw_bedrag = round(btw_totaal, 2)
+        factuur.totaal = round(subtotaal + btw_totaal, 2)
+
+        db.session.commit()
+        flash(f'Verkoopfactuur {factuur.factuurnummer} is bijgewerkt.', 'success')
+        return redirect(url_for('verkoopfacturen.detail', id=id))
+
+    klanten = Klant.query.order_by(Klant.naam).all()
+    valutas = Valuta.query.order_by(Valuta.code).all()
+    rekeningen = Grootboekrekening.query.filter_by(type='opbrengsten').order_by(Grootboekrekening.code).all()
+    return render_template('verkoopfacturen/bewerk.html',
+                           factuur=factuur, klanten=klanten,
+                           valutas=valutas, rekeningen=rekeningen)
+
+
 @verkoopfacturen_bp.route('/<int:id>/verzend', methods=['POST'])
 def verzend(id):
     factuur = Verkoopfactuur.query.get_or_404(id)
