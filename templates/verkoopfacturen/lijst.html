@@ -39,6 +39,7 @@
                     <th>Status</th>
                     <th class="text-end">Totaal</th>
                     <th class="text-end">Openstaand</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -63,10 +64,18 @@
                             -
                         {% endif %}
                     </td>
+                    <td class="text-end">
+                        <form method="post" action="{{ url_for('verkoopfacturen.verwijder', id=f.id) }}" class="d-inline"
+                              onsubmit="return confirm('Weet u zeker dat u factuur {{ f.factuurnummer }} wilt verwijderen?')">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Verwijderen">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="7" class="text-center text-muted py-4">
+                    <td colspan="8" class="text-center text-muted py-4">
                         Geen facturen gevonden. <a href="{{ url_for('verkoopfacturen.nieuw') }}">Maak een factuur aan</a>.
                     </td>
                 </tr>

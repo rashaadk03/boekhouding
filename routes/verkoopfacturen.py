@@ -234,9 +234,6 @@ def pdf(id):
 @verkoopfacturen_bp.route('/<int:id>/verwijder', methods=['POST'])
 def verwijder(id):
     factuur = Verkoopfactuur.query.get_or_404(id)
-    if factuur.status != 'concept':
-        flash('Alleen conceptfacturen kunnen verwijderd worden.', 'danger')
-        return redirect(url_for('verkoopfacturen.detail', id=id))
     nr = factuur.factuurnummer
     db.session.delete(factuur)
     db.session.commit()

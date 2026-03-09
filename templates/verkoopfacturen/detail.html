@@ -22,14 +22,12 @@
         <a href="{{ url_for('verkoopfacturen.bewerk', id=factuur.id) }}" class="btn btn-outline-primary">
             <i class="bi bi-pencil"></i> Bewerken
         </a>
-        {% if factuur.status == 'concept' %}
         <form method="post" action="{{ url_for('verkoopfacturen.verwijder', id=factuur.id) }}" class="d-inline"
               onsubmit="return confirm('Weet u zeker dat u deze factuur wilt verwijderen?')">
             <button type="submit" class="btn btn-outline-danger">
                 <i class="bi bi-trash"></i> Verwijderen
             </button>
         </form>
-        {% endif %}
         <a href="{{ url_for('verkoopfacturen.lijst') }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Terug
         </a>
