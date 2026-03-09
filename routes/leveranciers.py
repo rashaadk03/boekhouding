@@ -38,6 +38,7 @@ def nieuw():
             btw_nummer=request.form.get('btw_nummer', ''),
             email=request.form.get('email', ''),
             telefoon=request.form.get('telefoon', ''),
+            iban=request.form.get('iban', ''),
         )
         db.session.add(leverancier)
         db.session.commit()
@@ -59,6 +60,7 @@ def bewerk(id):
         leverancier.btw_nummer = request.form.get('btw_nummer', '')
         leverancier.email = request.form.get('email', '')
         leverancier.telefoon = request.form.get('telefoon', '')
+        leverancier.iban = request.form.get('iban', '')
         db.session.commit()
         flash(f'Leverancier "{leverancier.naam}" is bijgewerkt.', 'success')
         return redirect(url_for('leveranciers.lijst'))

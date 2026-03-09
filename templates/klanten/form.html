@@ -51,6 +51,10 @@
                     <label class="form-label">Telefoon</label>
                     <input type="text" name="telefoon" class="form-control" value="{{ klant.telefoon if klant else '' }}">
                 </div>
+                <div class="col-md-6">
+                    <label class="form-label">IBAN</label>
+                    <input type="text" name="iban" class="form-control" value="{{ klant.iban if klant else '' }}" placeholder="NL00BANK0123456789">
+                </div>
             </div>
             <div class="mt-4">
                 <button type="submit" class="btn btn-primary">

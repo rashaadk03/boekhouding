@@ -33,6 +33,7 @@
                     <th>Email</th>
                     <th>Telefoon</th>
                     <th>BTW-nummer</th>
+                    <th>IBAN</th>
                     <th class="text-end">Acties</th>
                 </tr>
             </thead>
@@ -44,6 +45,7 @@
                     <td>{{ klant.email or '-' }}</td>
                     <td>{{ klant.telefoon or '-' }}</td>
                     <td>{{ klant.btw_nummer or '-' }}</td>
+                    <td>{{ klant.iban or '-' }}</td>
                     <td class="text-end">
                         <a href="{{ url_for('klanten.bewerk', id=klant.id) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
@@ -58,7 +60,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-4">
+                    <td colspan="7" class="text-center text-muted py-4">
                         Geen klanten gevonden. <a href="{{ url_for('klanten.nieuw') }}">Voeg een klant toe</a>.
                     </td>
                 </tr>

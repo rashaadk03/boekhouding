@@ -37,6 +37,7 @@ class Klant(db.Model):
     btw_nummer = db.Column(db.String(20))
     email = db.Column(db.String(200))
     telefoon = db.Column(db.String(20))
+    iban = db.Column(db.String(34))
     aangemaakt_op = db.Column(db.DateTime, default=datetime.utcnow)
     facturen = db.relationship('Verkoopfactuur', backref='klant', lazy=True)
 
@@ -56,6 +57,7 @@ class Leverancier(db.Model):
     btw_nummer = db.Column(db.String(20))
     email = db.Column(db.String(200))
     telefoon = db.Column(db.String(20))
+    iban = db.Column(db.String(34))
     aangemaakt_op = db.Column(db.DateTime, default=datetime.utcnow)
     facturen = db.relationship('Inkoopfactuur', backref='leverancier', lazy=True)
 

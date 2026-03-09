@@ -38,6 +38,7 @@ def nieuw():
             btw_nummer=request.form.get('btw_nummer', ''),
             email=request.form.get('email', ''),
             telefoon=request.form.get('telefoon', ''),
+            iban=request.form.get('iban', ''),
         )
         db.session.add(klant)
         db.session.commit()
@@ -59,6 +60,7 @@ def bewerk(id):
         klant.btw_nummer = request.form.get('btw_nummer', '')
         klant.email = request.form.get('email', '')
         klant.telefoon = request.form.get('telefoon', '')
+        klant.iban = request.form.get('iban', '')
         db.session.commit()
         flash(f'Klant "{klant.naam}" is bijgewerkt.', 'success')
         return redirect(url_for('klanten.lijst'))

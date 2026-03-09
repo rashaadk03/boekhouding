@@ -33,6 +33,7 @@
                     <th>Email</th>
                     <th>Telefoon</th>
                     <th>BTW-nummer</th>
+                    <th>IBAN</th>
                     <th class="text-end">Acties</th>
                 </tr>
             </thead>
@@ -44,6 +45,7 @@
                     <td>{{ lev.email or '-' }}</td>
                     <td>{{ lev.telefoon or '-' }}</td>
                     <td>{{ lev.btw_nummer or '-' }}</td>
+                    <td>{{ lev.iban or '-' }}</td>
                     <td class="text-end">
                         <a href="{{ url_for('leveranciers.bewerk', id=lev.id) }}" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-pencil"></i>
@@ -58,7 +60,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" class="text-center text-muted py-4">
+                    <td colspan="7" class="text-center text-muted py-4">
                         Geen leveranciers gevonden. <a href="{{ url_for('leveranciers.nieuw') }}">Voeg een leverancier toe</a>.
                     </td>
                 </tr>
