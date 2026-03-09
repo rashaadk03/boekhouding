@@ -48,7 +48,8 @@
                         <strong>{{ factuur.klant.naam }}</strong><br>
                         {% if factuur.klant.adres %}{{ factuur.klant.adres }}<br>{% endif %}
                         {% if factuur.klant.postcode %}{{ factuur.klant.postcode }} {{ factuur.klant.plaats }}<br>{% endif %}
-                        {% if factuur.klant.btw_nummer %}BTW: {{ factuur.klant.btw_nummer }}{% endif %}
+                        {% if factuur.klant.btw_nummer %}BTW: {{ factuur.klant.btw_nummer }}<br>{% endif %}
+                        {% if factuur.klant.iban %}IBAN: {{ factuur.klant.iban }}{% endif %}
                     </div>
                     <div class="col-md-6">
                         <table class="table table-sm">
