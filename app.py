@@ -1,9 +1,32 @@
 from flask import Flask
 from flask_login import LoginManager
+from sqlalchemy import inspect, text
 from config import Config
 from models import db, init_standaard_data, Gebruiker
 from routes import all_blueprints
 from routes.auth import auth_bp
+
+
+def voer_migraties_uit():
+    """Voeg ontbrekende kolommen toe aan bestaande tabellen."""
+    migraties = [
+        ('klant', 'iban', 'VARCHAR(34)'),
+        ('leverancier', 'iban', 'VARCHAR(34)'),
+        ('inkoopfactuur', 'pdf_bestand', 'VARCHAR(500)'),
+    ]
+    try:
+        inspector = inspect(db.engine)
+        tabellen = inspector.get_table_names()
+        for tabel, kolom, kolom_type in migraties:
+            if tabel in tabellen:
+                kolommen = [c['name'] for c in inspector.get_columns(tabel)]
+                if kolom not in kolommen:
+                    db.session.execute(text(
+                        f'ALTER TABLE {tabel} ADD COLUMN {kolom} {kolom_type}'
+                    ))
+                    db.session.commit()
+    except Exception:
+        db.session.rollback()
 
 
 def create_app():
@@ -28,6 +51,7 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        voer_migraties_uit()
         init_standaard_data()
 
     # Jinja2 filters
